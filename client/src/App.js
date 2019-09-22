@@ -291,11 +291,11 @@ class WeatherApp extends React.Component{
 				<section>
 					<article>
 						<h2>{weather.name}, {weather.sys.country}</h2>
-						<div className='button' onClick={this.props.toggleSection} title='zmień lokalizacje'>
+						<div className='button' onClick={this.props.toggleSection} title={this.props.openLocalization ? 'zamknij opcje lokalizacji' : 'zmień lokalizacje'}>
 							<i className='icon-localization-2'></i>
 						</div>
 						<h3>
-							{toLocaleDayString(weather.dt * 1000).substr(0,3)} <span title="czas pobrania danych">{date.toLocaleTimeString().slice(0,-3)}</span>
+						<span title={toLocaleDayString(weather.dt * 1000)}>{toLocaleDayString(weather.dt * 1000).substr(0,3)}</span> <span title="czas pobrania danych">{date.toLocaleTimeString().slice(0,-3)}</span>
 							, <span title={weather.weather[0].description}>{weather.weather[0].main}</span>
 						</h3>
 						<h1 className='unit celsius'>{Math.round(weather.main.temp)}</h1>
@@ -762,8 +762,11 @@ class App extends React.Component{
 		return (
 			<main id="app">
 				<AppLocalization open={this.state.openLocalizationSection} callByLocalization={this.callByLocalization} callByCityId={this.callByCityId} data={this.state.fetch} />
-				<WeatherApp data={this.state.data.weather} toggleSection={this.toggleLocalizationSection} />
+				<WeatherApp data={this.state.data.weather} toggleSection={this.toggleLocalizationSection} openLocalization={this.state.openLocalizationSection} />
 				<ForecastApp data={this.state.data.forecast} />
+				<footer>
+					<i>Powered by <a href='https://openweathermap.org' rel="nofollow license noopener noreferrer" target='_blank'>OpenWeatherMap.org</a></i>
+				</footer>
 			</main>
 		)
 	}
