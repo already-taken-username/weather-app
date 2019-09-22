@@ -4,7 +4,11 @@
 
 ## How to use
 
-Start the server
+Installation
+```
+npm install
+```
+start the server
 ```
 node .
 ```
