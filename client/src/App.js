@@ -13,7 +13,7 @@ function setColor(output){
 			input.setAttribute("min", "0");
 			input.setAttribute("max", "360");
 			input.setAttribute("value", "198");
-			input.setAttribute("oninput", "setColor()");
+			input.setAttribute("oninput", "document.documentElement.style.setProperty('--weather-hue', this.value)");
 			input.setAttribute("id", "hueRange");
 			document.getElementById("dayProgress").appendChild(input);
 			setValue = 198;
@@ -291,9 +291,12 @@ class WeatherApp extends React.Component{
 				<section>
 					<article>
 						<h2>{weather.name}, {weather.sys.country}</h2>
-						<div className='button' onClick={this.props.toggleSection} title={this.props.openLocalization ? 'zamknij opcje lokalizacji' : 'zmień lokalizacje'}>
-							<i className='icon-localization-2'></i>
-						</div>
+						<label>
+							<input type="button" onClick={this.props.toggleSection} />
+							<div className='button' title={this.props.openLocalization ? 'zamknij opcje lokalizacji' : 'zmień lokalizacje'}>
+								<i className='icon-localization-2'></i>
+							</div>
+						</label>
 						<h3>
 						<span title={toLocaleDayString(weather.dt * 1000)}>{toLocaleDayString(weather.dt * 1000).substr(0,3)}</span> <span title="czas pobrania danych">{date.toLocaleTimeString().slice(0,-3)}</span>
 							, <span title={weather.weather[0].description}>{weather.weather[0].main}</span>
@@ -317,6 +320,14 @@ class WeatherApp extends React.Component{
 		}
 		return(
 			<section>
+				<article>
+					<label>
+						<input type="button" onClick={this.props.toggleSection} />
+						<div className='button' title={this.props.openLocalization ? 'zamknij opcje lokalizacji' : 'zmień lokalizacje'}>
+							<i className='icon-localization-2'></i>
+						</div>
+					</label>
+				</article>
 				<PendingApp error={ data.message ? data.message : null } />
 			</section>
 		)
@@ -405,7 +416,7 @@ class ForecastApp extends React.Component{
 							<hr />
 							<WeatherInformation data={{ date: date(), weather: weather[date()] }} />
 						</article>
-					: null }
+					: <article></article> }
 					<article>
 						<ul>
 							{ keys.map( key =>
@@ -452,16 +463,25 @@ class PendingApp extends React.Component{
 	}
 }
 
+class LoadingApp extends React.Component{
+	render(){
+		return(
+			<div className='loading'>
+			</div>
+		)
+	}
+}
+
 class LocalizationListElement extends React.Component{
 	render(){
-		const element = this.props.properties
+		const element = this.props.properties;
 		return(
-			<label>
+			<label key={element.id}>
+				<input type='button' value={element.id} onClick={element.action} />
 				<li className='button'>
 					<span>{element.name}</span>
 					<span>{element.country}</span>
 				</li>
-				<input type='button' value={element.id} onClick={element.action} />
 			</label>
 		)
 	}
@@ -473,7 +493,8 @@ class AppLocalization extends React.Component{
 		this.state = {
 			input: '',
 			found: {},
-			last: []
+			history: [],
+			pending: false
 		}
 		this.typeLocalization = this.typeLocalization.bind(this);
 		this.searchLocalization = this.searchLocalization.bind(this);
@@ -488,65 +509,103 @@ class AppLocalization extends React.Component{
 	}
 	searchLocalization(){
 		const url = this.props.data.url + 'weather?q=' + this.state.input + '&appid=' + this.props.data.api;
-		fetch(url)
-			.then(response => response.json())
-			.then(data => {
-				if( String(data.cod) === '200' ){
-					const city = {
-						name: data.name,
-						country: data.sys.country,
-						coord: data.coord,
-						id: data.id,
-						cod: 200
-					}
-					var last = this.state.last;
-					last.push(city);
-					this.setState((state,props)=>{
-						return{
-							found: city,
-							last: last
+		this.setState((state,props)=>{
+			return{
+				pending: true
+			}
+		}, ()=>{
+			fetch(url)
+				.then(response => response.json())
+				.then(data => {
+					if( String(data.cod) === '200' ){
+						const city = {
+							name: data.name,
+							country: data.sys.country,
+							coord: data.coord,
+							id: data.id,
+							cod: 200
 						}
-					})
-				}else{
-					this.setState((state,props)=>{
-						return{
-							found: { 
-								cod: 404,
-								input: this.state.input
+						var history = [];
+						history.push( city );
+						this.state.history.map((element)=>{
+							if( element.id !== city.id ){
+								history.push( element );
 							}
-						}
-					})
-				}
-			} )
-			.catch(error => { console.log(error) })
+						})
+						this.setState((state,props)=>{
+							return{
+								found: city,
+								history: history,
+								pending: false
+							}
+						})
+					}else{
+						this.setState((state,props)=>{
+							return{
+								found: { 
+									cod: 404,
+									input: this.state.input
+								},
+								pending: false
+							}
+						})
+					}
+				} )
+				.catch(error => { console.log(error) })
+		})
 	}
 	render(){
 		return(
 			<section id='localization' className={ !this.props.open ? 'hideElement' : null }>
-				<label>
-					<i className='icon-search'></i>
-					<input type='text' onChange={this.typeLocalization} autoFocus />
-				</label>
-				<hr />
-				<div className='button' onClick={this.props.callByLocalization} title='użyj autolokalizacji'>
-					<i className='icon-localization-1'></i>    
-				</div>
-				<ul className={ this.state.input.length < 3 ? 'hideElement' : null }>
-					<p>
-						<li onClick={this.searchLocalization} className='button' >
-							<i className='icon-search'></i> Szukaj
-						</li>
-						{ this.state.found.cod === 200 ?
-							<LocalizationListElement 
-								properties={{
-									name: this.state.found.name,
-									country: this.state.found.country,
-									id: this.state.found.id,
-									action: this.props.callByCityId
-								}} />
-						: <li className={ this.state.found.cod === 404 ? null : 'hideElement'}><i>Nie znaleziono</i></li> }
-					</p>
-				</ul>
+				<article>
+					<label>
+						<i className='icon-search'></i>
+						<input type='text' onChange={this.typeLocalization} disabled={this.state.pending} autoFocus />
+					</label>
+					<hr />
+					<label>
+						<input type='button' onClick={this.props.callByLocalization} disabled={this.state.pending} />
+						<div className='button' title='użyj autolokalizacji'>
+							<i className='icon-localization-1'></i>    
+						</div>
+					</label>
+				</article>
+				<article>
+					<ul>
+						<p className={ this.state.input.length < 3 ? 'hideElement' : null }>
+							<label>
+								<input type='submit' onClick={this.searchLocalization} disabled={this.state.pending} />
+								<li className='button'>
+									<i className='icon-search'></i> Szukaj
+								</li>
+							</label>
+							{ this.state.pending ? <li> <LoadingApp /> </li> : 
+							( this.state.found.cod === 200 ?
+								<LocalizationListElement 
+									properties={{
+										name: this.state.found.name,
+										country: this.state.found.country,
+										id: this.state.found.id,
+										action: this.props.callByCityId
+									}} />
+							: <li className={ this.state.found.cod === 404 ? null : 'hideElement'}><i>Nie znaleziono</i></li> ) }
+						</p>
+						<p className={ Object.keys( this.state.history ).length > 1 ? null : 'hideElement' }>
+							<li>
+								<i>Ostatnio wyszukiwane:</i>
+							</li>
+							{  Object.keys( this.state.history ).map((key) =>
+								<LocalizationListElement 
+									properties={{
+										name: this.state.history[key].name,
+										country: this.state.history[key].country,
+										id: this.state.history[key].id,
+										action: this.props.callByCityId
+									}} />
+							) }
+						</p>
+					</ul>
+				</article>
 			</section>
 		)
 	}
@@ -580,7 +639,8 @@ class App extends React.Component{
 				forecast: {
 					cod: '404',
 				}
-			}
+			},
+			color: false
 		}
 		this.toggleLocalizationSection = this.toggleLocalizationSection.bind(this);
 		this.callByLocalization = this.callByLocalization.bind(this);
@@ -758,6 +818,15 @@ class App extends React.Component{
 			}
 		})
 	}
+	setColor(){
+		this.setState((state,props)=>{
+			return{
+				color: !this.state.color
+			}
+		},()=>{
+			setColor(this.state.color);
+		})
+	}
 	render(){
 		return (
 			<main id="app">
@@ -765,7 +834,7 @@ class App extends React.Component{
 				<WeatherApp data={this.state.data.weather} toggleSection={this.toggleLocalizationSection} openLocalization={this.state.openLocalizationSection} />
 				<ForecastApp data={this.state.data.forecast} />
 				<footer>
-					<i>Powered by <a href='https://openweathermap.org' rel="nofollow license noopener noreferrer" target='_blank'>OpenWeatherMap.org</a></i>
+					<i>Powered by <a href='https://openweathermap.org' rel="nofollow license noopener noreferrer" target='_blank'>OpenWeatherMap.org</a><b onClick={()=>{this.setColor()}}>.</b></i>
 				</footer>
 			</main>
 		)

@@ -9,6 +9,13 @@
 
     --weather-color-4: hsl( calc( var(--weather-hue) + 6 ), 17%, 94%);
     --weather-color-5: hsl( calc( var(--weather-hue) - 162 ), 94%, 59%);
+
+    --weather-color-6: rgba(0,0,0,0.12);
+    --weather-color-7: rgba(0,0,0,0.25);
+
+    --spacing-1: 24px;
+    --spacing-2: 16px;
+    --spacing-3: 10px;
 }
 
 body{
@@ -27,7 +34,7 @@ body{
 
 #app{
     width: 360px;
-    margin: 12px;
+    margin: var(--spacing-2);
     background-color: var(--weather-color-5);
     color: var(--weather-color-4);
     box-shadow: 1px 2px 4px rgba(0,0,0,0.4);
@@ -35,6 +42,20 @@ body{
     overflow: hidden;
     cursor: default;
     user-select: none;
+}
+
+#app .button{
+    cursor: pointer;
+}
+
+#app input[type='button'], #app input[type='submit']{
+    display: none;
+}
+
+#app input[type='button']:disabled ~ .button, #app input[type='submit']:disabled ~ .button{
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
 }
 
 #app h1, #app h2, #app h3, #app h4{
@@ -49,7 +70,7 @@ body{
 }
 
 #app h2{
-    font-weight: 500;
+    font-weight: 600;
     font-size: 32px;
 }
 
@@ -74,26 +95,30 @@ body{
 #app article hr{
     height: 1px;
     border: none;
-    width: calc(100% - 48px);
+    width: calc(100% - calc( var(--spacing-1) * 2 ));
     padding: 0;
-    margin: 0 24px 12px 24px;
+    margin: 0 var(--spacing-1) var(--spacing-2) var(--spacing-1);
     background-color: var(--weather-color-3);
 }
 
 #app section:nth-of-type(1){
     background-color: var(--weather-color-5);
     position: relative;
-    display: grid;
-    grid-template-columns: auto 2px 64px;
-    grid-template-rows: 70px max-content;
-    grid-template-areas:
-        'search hr button'
-        'list list list';
-    align-items: stretch;
     color: var(--weather-color-2);
+    display: grid;
 }
 
-#app section:nth-of-type(1) > label{
+#app section:nth-of-type(1) article:first-of-type{
+    background-color: var(--weather-color-5);
+    display: grid;
+    grid-template-columns: auto 2px max-content;
+    grid-template-rows: 70px;
+    grid-template-areas:
+        'search hr button';
+    align-items: stretch;
+}
+
+#app section:nth-of-type(1) article:first-of-type > label:first-of-type{
     grid-area: search;
     display: grid;
     grid-template-columns: max-content auto;
@@ -101,19 +126,21 @@ body{
     cursor: text;
 }
 
-#app section:nth-of-type(1) > label i{
+#app section:nth-of-type(1) article:first-of-type > label:first-of-type i{
     grid-area: icon;
     font-size: 22px;
     line-height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px 12px 24px 24px;
+    padding: 0 var(--spacing-2) 0 var(--spacing-1);
+    height: 100%;
 }
 
-#app section:nth-of-type(1) input[type="text"]{
+#app section:nth-of-type(1) article:first-of-type > label:first-of-type input[type="text"]{
     grid-area: input;
     width: 100%;
+    height: 100%;
     line-height: 22px;
     font-size: 20px;
     padding: 0;
@@ -122,66 +149,72 @@ body{
     border: none;
     background: none;
     color: var(--weather-color-2);
+    transition: opacity .2s;
+    opacity: 0.6;
 }
 
-#app section:nth-of-type(1) input[type="text"]:focus{
-    font-weight: bold;
+#app section:nth-of-type(1) article:first-of-type > label:first-of-type input[type="text"]:focus{
+    opacity: 1;
 }
 
-#app section:nth-of-type(1) hr{
+#app section:nth-of-type(1) article:first-of-type > hr{
     grid-area: hr;
     display: block;
     width: 2px;
-    height: 46px;
+    height: calc( 100% - calc( var(--spacing-2) * 2 ) );
     padding: 0;
-    margin: 12px 0;
+    margin: var(--spacing-2) 0;
     border: none;
     background-color: var(--weather-color-2);
 }
 
-#app section:nth-of-type(1) > .button{
+#app section:nth-of-type(1) article:first-of-type > label:last-of-type{
     grid-area: button;
+}
+
+#app section:nth-of-type(1) article:first-of-type > label:last-of-type .button{
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
-    width: 40px;
+    padding: 0 var(--spacing-2);
+    height: 100%;
+    max-width: 40px;
     background-color: transparent;
     font-size: 28px;
-    cursor: pointer;
     transition: opacity .2s;
 }
 
-#app section:nth-of-type(1) > .button:hover{
+#app section:nth-of-type(1) article:first-of-type > label:last-of-type input[type='button']:not(:disabled) ~ .button:hover{
     opacity: 0.6;
 }
 
-#app section:nth-of-type(1) ul{
+#app section:nth-of-type(1) article:last-of-type{
+    background-color: var(--weather-color-6);
+}
+
+#app section:nth-of-type(1) article:last-of-type ul{
     font-size: 16px;
     grid-area: list;
     padding: 0;
     width: 100%;
     margin: 0;
     list-style: none;
-    top: 70px;
-    left: 0;
-    z-index: 1;
     color: var(--weather-color-4);
-    background-color: rgba(0,0,0,0.12);
 }
 
-#app section:nth-of-type(1) ul p{
-    margin: 16px 16px;
+#app section:nth-of-type(1) article:last-of-type ul p{
+    padding: var(--spacing-2) var(--spacing-1);
+    margin: 0;
     display: grid;
-    grid-gap: 12px;
+    grid-gap: var(--spacing-2);
     align-items: center;
 }
 
-#app section:nth-of-type(1) ul p:first-of-type{
+#app section:nth-of-type(1) article:last-of-type ul p:first-of-type{
     grid-template-columns: max-content auto;
 }
 
-#app section:nth-of-type(1) ul li{
+#app section:nth-of-type(1) article:last-of-type ul li{
     padding: 8px 16px;
     border-radius: 4px;
     grid-gap: 4px;
@@ -190,26 +223,26 @@ body{
     align-items: center;
 }
 
-#app section:nth-of-type(1) ul .button{
-    cursor: pointer;
-    background-color: rgba(0,0,0,0.16);
-    transition: background-color .3s, color .3s;
-}
-
-#app section:nth-of-type(1) ul .button:hover{
-    background-color: rgba(0,0,0,0.25);
-}
-
-#app section:nth-of-type(1) ul label .button:hover{
-    color: var(--weather-color-5);
-}
-
-#app section:nth-of-type(1) ul input[type='button']{
+#app section:nth-of-type(1) article:last-of-type ul p:last-of-type label:not(:nth-of-type(-n+4)){
     display: none;
 }
 
+#app section:nth-of-type(1) article:last-of-type ul .button{
+    cursor: pointer;
+    background-color: var(--weather-color-6);
+    transition: background-color .3s, color .3s;
+}
+
+#app section:nth-of-type(1) article:last-of-type ul input:not(:disabled) ~ .button:hover{
+    background-color: var(--weather-color-7);
+}
+
+#app section:nth-of-type(1) article:last-of-type ul input[type='button']:not(:disabled) ~ .button:hover{
+    color: var(--weather-color-5);
+}
+
 #app section:nth-of-type(2) article:first-of-type{
-    padding: 24px 24px 12px 24px;
+    padding: var(--spacing-1) var(--spacing-1) var(--spacing-2) var(--spacing-1);
     display: grid;
     grid-template-columns: auto auto auto max-content;
     grid-template-areas: 
@@ -224,7 +257,7 @@ body{
     grid-area: city;
 }
 
-#app section:nth-of-type(2) article:first-of-type .button{
+#app section:nth-of-type(2) article:first-of-type label{
     grid-area: localization;
     justify-self: end;
     align-self: center;
@@ -233,7 +266,13 @@ body{
     transition: color .2s;
 }
 
-#app section:nth-of-type(2) article:first-of-type .button:hover{
+#app section:nth-of-type(2) article:first-of-type .button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#app section:nth-of-type(2) article:first-of-type label input[type="button"]:not(:disabled) ~ .button:hover{
     color: var(--weather-color-5);
 }
 
@@ -253,16 +292,18 @@ body{
 
 #app section:nth-of-type(2) article:first-of-type h1{
     grid-area: temperature;
+    margin: calc( var(--spacing-2) * 2 ) 0;
 }
 
-#app section:nth-of-type(2) article:first-of-type i{
+#app section:nth-of-type(2) article:first-of-type > i{
     grid-area: icon;
     justify-self: end;
     align-self: center;
     width: 100%;
+    margin: calc( var(--spacing-2) * 2 ) 0;
 }
 
-#app section:nth-of-type(2) article:first-of-type i img{
+#app section:nth-of-type(2) article:first-of-type > i img{
     width: 100px;
     float: right;
     filter: brightness(450%);
@@ -296,8 +337,8 @@ body{
     width: 100%;
     background-color: var(--weather-color-1);
     height: 6px;
-    border-radius: 4px;
-    margin: 8px 0 0 0;
+    border-radius: 3px;
+    margin: var(--spacing-3) 0 0 0;
     position: relative;
     overflow: hidden;
     grid-area: progress;
@@ -334,6 +375,16 @@ body{
     left: 0;
 }
 
+#app section:nth-of-type(2) article:first-of-type div .progress input[type=range]::-moz-range-thumb{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 4px;
+    height: 16px;
+    background: var(--weather-color-5);
+    cursor: pointer;
+}
+
 #app section:nth-of-type(2) article:first-of-type div .progress input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -345,11 +396,11 @@ body{
 }
 
 #app section:nth-of-type(2) article:last-of-type{
-    padding: 12px 24px 8px 24px;
+    padding: var(--spacing-2) var(--spacing-1) calc( var(--spacing-2) / 2 ) var(--spacing-1);
 }
 
 #app section:nth-of-type(2) article:last-of-type h3{
-    margin: 8px 0;
+    margin: var(--spacing-3) 0;
     display: grid;
     grid-template-columns: max-content auto max-content;
     grid-gap: 4px;
@@ -367,7 +418,7 @@ body{
 
 #app section:nth-of-type(3) article:last-of-type{
     background-color: var(--weather-color-3);
-    padding: 12px 0 8px;
+    padding: var(--spacing-2) 0 calc( var(--spacing-2) / 2 );
 }
 
 #app section:nth-of-type(3) article:last-of-type ul{
@@ -385,8 +436,7 @@ body{
 #app section:nth-of-type(3) article:last-of-type h3{
     display: grid;
     grid-template-columns: auto max-content;
-    line-height: 32px;
-    margin: 4px 24px;
+    margin: var(--spacing-3) var(--spacing-1);
     cursor: pointer;
     transition: color .2s;
 }
@@ -408,7 +458,7 @@ body{
     display: grid;
     grid-auto-flow: column;
     grid-gap: 4px;
-    margin: 4px 24px 8px;
+    margin: var(--spacing-3) var(--spacing-1) var(--spacing-3);
     padding: 4px 0;
     justify-items: stretch;
     align-items: center;
@@ -453,7 +503,7 @@ body{
 }
 
 #app article .timeline{
-    padding: 4px 20px 16px;
+    padding: 4px var(--spacing-1) var(--spacing-2);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -535,7 +585,7 @@ body{
 
 #app footer{
     background-color: var(--weather-color-3);
-    padding: 12px 24px;
+    padding: var(--spacing-2) var(--spacing-1);
     text-align: right;
     font-size: 12px;
     color: var(--weather-color-4);
@@ -597,6 +647,46 @@ body{
 }
 
 
+#app input[type='button']:disabled ~ .button{
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#app .loading{
+    overflow: hidden;
+    border-radius: 4px;
+    padding: 4px;
+    border: 1px solid var(--weather-color-6);
+    width: calc(100% - 10px);
+    height: 8px;
+    position: relative;
+    text-align: center;
+    line-height: 8px;
+    font-size: 6px;
+    color: var(--weather-color-2);
+}
+
+#app .loading::before, #app .loading::after{
+    animation: stretch 2s infinite linear;
+    content: '';
+    width: 100%;
+    height: 8px;
+    opacity: 0;
+    display: block;
+    position: absolute;
+    margin: 4px;
+    top: 0;
+    background-color: var(--weather-color-4);
+}
+
+#app .loading::before{
+    animation-delay: 1s;
+}
+
+#app .loading::after{
+    animation-delay: 0s;
+}
+
 #app .pending{
     position: relative;
     text-align: center;
@@ -625,7 +715,7 @@ body{
 	background-color: transparent;
     border-width: 4px;
     border-style: solid;
-    border-color: rgba(0,0,0,0.1);
+    border-color: var(--weather-color-6);
     border-top-color: var(--weather-color-5);
 }
 
@@ -635,6 +725,17 @@ body{
     }
     to{
         transform: rotate(360deg);
+    }
+}
+
+@keyframes stretch{
+    0%{
+        transform: scaleX(0);
+        opacity: 1;
+    }
+    100%{
+        transform: scaleX(1);
+        opacity: 0;
     }
 }
 
@@ -648,5 +749,234 @@ body{
         width: 100%;
         min-width: 340px;
         border-radius: 0;
+    }
+}
+
+@media only screen and (min-width: 450px) {
+    :root{
+        --spacing-1: 40px;
+        --spacing-2: 20px;
+        --spacing-3: 16px;
+    }
+    #app{
+        margin: 0;
+        width: 100%;
+        min-width: 340px;
+        border-radius: 0;
+    }
+    #app section:nth-of-type(1) article:first-of-type > label:last-of-type .button{
+        padding: 0 var(--spacing-1);
+    }
+    #app section:nth-of-type(2) article:first-of-type div .progress{
+        height: 8px;
+        border-radius: 4px;
+    }
+}
+
+@media only screen and (min-width: 550px) {
+    #app{
+        margin: var(--spacing-2);
+        width: 550px;
+    }
+}
+
+@media only screen and (min-width: 1080px) {
+
+    :root{
+        --spacing-1: 42px;
+        --spacing-2: 22px;
+        --spacing-3: 18px;
+    }
+
+    #app{
+        margin: 0;
+        width: 100%;
+        display: grid;
+        position: relative;
+        background-color: var(--weather-color-5);
+    }
+
+    #app h1{
+        font-size: 100px;
+    }
+
+    #app h2{
+        font-size: 36px;
+    }
+
+    #app h3{
+        font-size: 24px;
+    }
+
+    #app h4{
+        font-size: 20px;
+    }
+
+    #app section:nth-of-type(1){
+        --spacing-1: 24px;
+        --spacing-2: 16px;
+        --spacing-3: 10px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 2;
+        grid-template-rows: 70px auto;
+        box-shadow: 1px 2px 32px rgba(0,0,0,0.6);
+        background-color: var(--weather-color-5);
+    }
+
+    #app section:nth-of-type(2){
+        background-color: var(--weather-color-2);
+        padding: var(--spacing-1) calc( var(--spacing-2) * 2 );
+        display: grid;
+        grid-template-columns: repeat(2, calc( 450px - calc( var(--spacing-1) / 2 ) ));
+        grid-auto-flow: column;
+        justify-content: center;
+        grid-gap: var(--spacing-1);
+
+    }
+    
+    #app section:nth-of-type(2) article:first-of-type{
+        padding: 0;
+    }
+
+    #app section:nth-of-type(2) article:first-of-type label{
+        align-self: start;
+    }
+
+    #app section:nth-of-type(2) article:first-of-type div{
+        align-content: flex-end;
+        grid-template-rows: max-content max-content;
+    }
+
+    #app section:nth-of-type(2) article:last-of-type{
+        padding: var(--spacing-1);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-content: space-between;
+        flex-wrap: nowrap;
+        justify-content: space-around;
+    }
+
+    #app section:nth-of-type(3){
+        padding: var(--spacing-1) calc( var(--spacing-2) * 2 );
+        background-color: var(--weather-color-3);
+    }
+
+    #app section:nth-of-type(3) article{
+        width: calc( 900px + var(--spacing-1) );
+        margin: 0 auto;
+    }
+
+    #app section:nth-of-type(3) article:first-of-type{
+        border-radius: 16px;
+        width: calc( calc( 900px + var(--spacing-1) ) - calc(  var(--spacing-2) * 2 ) );
+        overflow: hidden;
+        margin-bottom: var(--spacing-1);
+    }
+    
+    #app section:nth-of-type(3) article:first-of-type hr{
+        display: none;
+    }
+    
+    #app section:nth-of-type(3) article:first-of-type .bar{
+        background-color: var(--weather-color-6);
+        padding: var(--spacing-2) calc( var(--spacing-2) + var(--spacing-1) );
+        margin: 0;
+    }
+
+    #app section:nth-of-type(3) article:first-of-type .timeline{
+        padding: var(--spacing-2);
+    }
+
+    #app section:nth-of-type(3) article:last-of-type ul{
+        display: flex;
+        flex-flow: row wrap;
+        align-content: space-between;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    #app section:nth-of-type(3) article:last-of-type ul li{
+        width: calc(50% - var(--spacing-2));
+        margin-bottom: var(--spacing-1);
+    }
+
+    #app section:nth-of-type(3) article:last-of-type input[type='radio']:checked ~ h3{
+        color: var(--weather-color-4);
+        font-weight: normal;
+    }
+
+    #app section:nth-of-type(3) article:last-of-type input[type='radio'] ~ h3:hover{
+        color: var(--weather-color-4);
+    }
+
+    #app section:nth-of-type(3) article:last-of-type ul li .timeline{
+        margin: 4px var(--spacing-1) var(--spacing-2);
+        padding: 0;
+    }
+
+    #app section:nth-of-type(3) article:last-of-type li .hideElement{
+        display: block !important;
+    }
+
+    #app footer{
+        font-size: 16px;
+    }
+
+}
+
+@media only screen and (min-width: 1440px) {
+    
+    :root{
+        --spacing-1: 40px;
+    }
+
+    #app{
+        grid-template-areas: 
+            'localization current'
+            'localization forecast'
+            'localization footer';
+        grid-template-columns: 360px auto;
+        grid-template-rows: max-content auto;
+    }
+
+    #app section:nth-of-type(1){
+        grid-area: localization;
+        box-shadow: none;
+        position: sticky;
+        top: 0;
+        left: unset;
+        height: 100%;
+    }
+
+    #app section:nth-of-type(1).hideElement{
+        display: grid !important;
+    }
+
+    #app section:nth-of-type(2){
+        grid-area: current;
+    }
+
+    #app section:nth-of-type(2) article:first-of-type .button{
+        display: none;
+    }
+
+    #app section:nth-of-type(3){
+        grid-area: forecast;
+    }
+
+    #app footer{
+        grid-area: footer;
+    }
+
+}
+
+@media only screen and (min-width: 2000px) {
+    #app{
+        margin: var(--spacing-2);
+        width: 1440px;
     }
 }
