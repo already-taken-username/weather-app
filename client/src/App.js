@@ -348,16 +348,20 @@ class OneDayForecast extends React.Component{
 		var sunrise = new Date(data.city.sunrise * 1000),
 			sunset = new Date(data.city.sunset * 1000);
 
-		data.weather.map(tick => {
+		const stringReplace = ( text ) => {
+			return text.toLocaleTimeString().replace(/[:]/g,'')
+		}
+		for( let tick of data.weather ){
 			var now = new Date(tick.dt * 1000);
-			if( sunrise.toLocaleTimeString().replace(/\:/g,'') < now.toLocaleTimeString().replace(/\:/g,'') && now.toLocaleTimeString().replace(/\:/g,'') < sunset.toLocaleTimeString().replace(/\:/g,'') ){
+			if( stringReplace( sunrise ) < stringReplace( now ) && stringReplace( now ) < stringReplace( sunset ) ){
 				avgHigh += tick.main.temp;
 				avgHighNumber++;
 			}else{
 				avgLowNumber++;
 				avgLow += tick.main.temp;
 			}
-		})
+		}
+
 		avg = ( avgHigh * weightHigh + avgLow * weightLow ) / ( (avgLowNumber * weightLow) + (avgHighNumber * weightHigh) );
 		return avg
 	}
@@ -527,11 +531,11 @@ class AppLocalization extends React.Component{
 						}
 						var history = [];
 						history.push( city );
-						this.state.history.map((element)=>{
+						for( const element of this.state.history ){
 							if( element.id !== city.id ){
 								history.push( element );
 							}
-						})
+						}
 						this.setState((state,props)=>{
 							return{
 								found: city,
@@ -619,7 +623,7 @@ class App extends React.Component{
 				api: '5d33aafbe7cc14271bd32d9c75a32377',
 				units: 'metric',
 				lang: 'pl',
-				url: 'http://api.openweathermap.org/data/2.5/',
+				url: 'https://api.openweathermap.org/data/2.5/',
 				city: '7532248',
 				position: {
 					lat: '51',
@@ -781,12 +785,13 @@ class App extends React.Component{
 	fetchForecast(){
 		this.fetchData('forecast').then(data => {
 			if( String(data.cod) === '200' ){
-				data.list.map((element, index)=>{
-					const volume = ( element.rain ? element.rain['3h'] : 0 ) + ( element.snow ? element.snow['3h'] : 0 );
+				for( const index in data.list ){
+					const element = data.list[index]
+					const volume = ( element.rain ? element.rain['3h'] : 0 ) + ( element.snow ? element.snow['3h'] : 0 )
 					data.list[index].downfall = {
 						'3h': ( volume > 0 ? volume : null )
 					}
-				})
+				}
 				const groupBy = key => array =>
 					array.reduce((objectsByKeyValue, obj) => {
 					const value = obj[key].split(' ')[0].replace(/-/g, '');

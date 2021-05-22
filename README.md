@@ -2,6 +2,12 @@
 
 ### Based on [React.js](https://https://reactjs.org/) library and [openweathermap.org](https://openweathermap.org) free api, fetch data and display it for users.
 
+## Live preview
+
+```
+https://weather-app-iubqu9aj.netlify.app/
+```
+
 ## How to use
 
 Installation
